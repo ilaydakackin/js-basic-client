@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="getProducts()">Get Products</button>
+    <button onclick="getProductsById()">Get Product</button>
+    <button onclick="login()">Login</button>
+
+    <div id="divProducts">
+    </div>
+
+    <script>
+
+        const login = async () =>{
+            const response = await fetch("https://localhost:7015/api/user/login", {
+                headers:{
+                    "Accept" : "application/json",
+                    "Content-Type" : "application/json", 
+                },
+                method: "POST",
+                body: JSON.stringify({email:'kackinilayda@gmail.com', password :'135790'})
+            });
+            const result = await response.json(); 
+            localStorage.setItem("token", JSON.stringify(result.token));
+        }
+
+        const getProducts = async () => {
+           const response = await fetch("https://localhost:7015/api/products");
+
+           const products = await response.json();
+           console.log(products)
+            //products'ı displayProducts'a parametre olarak göndermek
+           displayProducts(products);
+        }
+
+        const getProductsById = async () =>{
+            const token = JSON.parse(localStorage.getItem("token"));
+            const response = await fetch("https://localhost:7015/api/products/4", {
+                headers: {Authorization: `Bearer ${token}`}
+            });
+            const products = await response.json();
+            displayProduct(products);
+           
+        }
+
+        const displayProduct = (product) => {
+           const parent = document.getElementById("divProducts");
+
+            parent.innerHTML = `
+                <div style="display:flex;">
+                    <h4>${product.productName}</h4>
+                    <h4 style="color:#00008B;">${product.price}</h4>
+                </div>
+            `;  
+        }
+        const displayProducts = (products) => {
+           const parent = document.getElementById("divProducts");
+
+           //gelen her bir ürün bigisini göndermek
+            products.forEach(prd => {
+                parent.innerHTML += `
+                <div style="display:flex;">
+                    <h4>${prd.productName}</h4>
+                    <h4 style="color:#00008B;">${prd.price}</h4>
+                </div>
+            `;
+           });
+        }
+    </script>
+</body>
+</html>
